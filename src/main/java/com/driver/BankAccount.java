@@ -46,26 +46,15 @@ public class BankAccount {
         if(digits <= 0 || sum < 0 || sum > digits * 9){
             throw new Exception("Account Number can not be generated");
         }
-        int[] accNoArr = new int[digits];
-        int sumOfAllDigits = 0;
-        boolean isAccNoGenerated = false;
-
-        for(int i = digits-1; i >= 0; i--){
-            if(sum == 0) break;
-            while(accNoArr[i] <= 9){
-                accNoArr[i] += 1;
-                sumOfAllDigits++;
-                if(sumOfAllDigits == sum){
-                    isAccNoGenerated = true;
-                    break;
-                }
-            }
-            if(isAccNoGenerated) break;
-        }
-
         StringBuilder accountNo = new StringBuilder();
-        for(int i = 0; i < digits; i++){
-            accountNo.append(accNoArr[i]);
+        while(digits-->0){
+            if(sum>=9){
+                accountNo.append(9);
+                sum-=9;
+            }else{
+                accountNo.append(sum);
+                sum=0;
+            }
         }
         return accountNo.toString();
     }
