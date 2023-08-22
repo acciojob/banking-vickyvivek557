@@ -1,6 +1,7 @@
 package com.driver;
 
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 public class CurrentAccount extends BankAccount{
     private String tradeLicenseId; //consists of Uppercase English characters only
@@ -24,64 +25,67 @@ public class CurrentAccount extends BankAccount{
         this.tradeLicenseId = tradeLicenseId;
     }
 
-    private HashMap<Character, Integer> freqMap = new HashMap<>();
     public void validateLicenseId() throws Exception {
-        boolean isVaid = isIdValid(this.tradeLicenseId);
-        if(isVaid) return;
-
-        /*now check if it can be validated or not.
-        * if the frequency of any char is greater than the half of the len of the id
-        * then id cannot be validated, throw exception*/
-
-        char[] idArray = tradeLicenseId.toCharArray();
-        for(char ch : idArray){
-            freqMap.put(ch, freqMap.getOrDefault(ch, 0) + 1);
+        // A trade license Id is said to be valid if no two consecutive characters are same
+        // If the license Id is valid, do nothing
+        // If the characters of the license Id can be rearranged to create any valid license Id
+        // If it is not possible, throw "Valid License can not be generated" Exception'
+        char[]arr=tradeLicenseId.toCharArray();
+        if(isValid(arr)) return;
+        PriorityQueue<Pair>pq=new PriorityQueue<>(new SortByFreq());
+        int freq[]=new int[26];
+        int n=arr.length;
+        for(int i=0;i<n;i++){
+            freq[arr[i]-'A']++;
         }
-        int idLength = this.tradeLicenseId.length();
-        for(char ch : freqMap.keySet()){
-            if(freqMap.get(ch) > idLength){
-                throw new Exception("Valid License can not be generated");
+        for(int i=0;i<26;i++){
+            if(freq[i]!=0){
+                pq.add(new Pair((char)(i+'A'),freq[i]));
             }
         }
-
-        //now it can be generated hence generate it
-        StringBuilder validId = new StringBuilder();
-        char lastCharAdded = '0';
-        for(int i = 0; i < idLength; i++){
-            char charToBeAdded = charToBeAdded(lastCharAdded);
-            validId.append(charToBeAdded);
-            lastCharAdded = charToBeAdded;
+        StringBuilder sb=new StringBuilder();
+        while(pq.size()>0){
+            Pair p1=pq.remove();
+            sb.append(p1.c);
+            p1.freq--;
+            boolean flag=false;
+            if(!pq.isEmpty()){
+                Pair p2=pq.remove();
+                sb.append(p2.c);
+                p2.freq--;
+                flag=true;
+                if(p1.freq>0)pq.add(p1);
+                if(p2.freq>0)pq.add(p2);
+            }
+            if(flag) continue;
+            if(p1.freq>0)pq.add(p1);
         }
-        this.tradeLicenseId = validId.toString();
+        String id=sb.toString();
+        char[]newArr=id.toCharArray();
+        if(isValid(newArr)) this.tradeLicenseId=id;
+        else throw new Exception("Valid License can not be generated");
     }
-
-    private char charToBeAdded(char lastAddedChar){
-        int maxFreq = 0;
-        char maxFreqChar = '0';
-        for(char ch : freqMap.keySet()){
-            if(ch != lastAddedChar){
-                int curFreq = freqMap.get(ch);
-                if(curFreq > maxFreq){
-                    maxFreq = curFreq;
-                    maxFreqChar = ch;
-                }
-            }
-        }
-        freqMap.put(maxFreqChar, maxFreq-1);
-        if(freqMap.get(maxFreqChar) <= 0){
-            freqMap.remove(maxFreqChar);
-        }
-        return maxFreqChar;
-    }
-
-    private boolean isIdValid(String id){
-        char[] idArray = id.toCharArray();
-        for(int i = 0; i< idArray.length - 1; i++){
-            if(idArray[i] == idArray[i+1]){
-                return false;
-            }
+    private boolean isValid(char[]arr){
+        int n=arr.length;
+        for(int i=1;i<n;i++){
+            if(arr[i]==arr[i-1]) return false;
         }
         return true;
+    }
+    class SortByFreq implements Comparator<Pair> {
+        public int compare(Pair a,Pair b){
+            return b.freq-a.freq;
+        }
+    }
+    class Pair{
+        char c;
+        int freq;
+
+        public Pair(char c, int freq) {
+            this.c = c;
+            this.freq = freq;
+        }
+
     }
 
 }
