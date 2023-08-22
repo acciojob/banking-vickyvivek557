@@ -7,6 +7,7 @@ public class BankAccount {
     private double minBalance;
 
     public BankAccount() {
+
     }
 
     public BankAccount(String name, double balance, double minBalance) {
@@ -14,6 +15,7 @@ public class BankAccount {
         this.balance = balance;
         this.minBalance = minBalance;
     }
+
 
     public String getName() {
         return name;
@@ -69,11 +71,9 @@ public class BankAccount {
     public void withdraw(double amount) throws Exception {
         // Remember to throw "Insufficient Balance" exception, if the remaining amount would be less than minimum balance
         double currBalance = this.balance - amount;
-        if(amount > 0 && currBalance >= this.minBalance){
-            this.balance -= amount;
-        }else{
+        if(amount > 0 && currBalance < this.minBalance){
             throw new Exception("Insufficient Balance");
         }
+        this.balance -= amount;
     }
-
 }
