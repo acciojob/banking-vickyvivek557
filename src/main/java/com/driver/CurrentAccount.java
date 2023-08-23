@@ -1,27 +1,30 @@
 package com.driver;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class CurrentAccount extends BankAccount{
     String tradeLicenseId; //consists of Uppercase English characters only
 
+
+
     public CurrentAccount(String name, double balance, String tradeLicenseId) throws Exception {
         // minimum balance is 5000 by default. If balance is less than 5000, throw "Insufficient Balance" exception
-        super(name, balance,5000);
-        if(balance < 5000){
+
+        super(name, balance, 5000);
+        if(balance<5000) {
             throw new Exception("Insufficient Balance");
         }
-        this.tradeLicenseId = tradeLicenseId;
+        this.tradeLicenseId= tradeLicenseId;
     }
+
     public CurrentAccount(String tradeLicenseId) {
         this.tradeLicenseId = tradeLicenseId;
     }
 
-    public CurrentAccount() {
-    }
-
     public String getTradeLicenseId() {
+        //System.out.println(this.tradeLicenseId);
         return tradeLicenseId;
     }
 
@@ -91,5 +94,4 @@ public class CurrentAccount extends BankAccount{
         }
 
     }
-
 }
